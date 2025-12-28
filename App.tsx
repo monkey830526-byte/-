@@ -298,7 +298,7 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Land Value & Build Amortization Insight */}
+                {/* Calculation Detail Insights */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between px-8">
                     <div className="flex items-center gap-4">
@@ -307,7 +307,7 @@ export default function App() {
                       </div>
                       <div>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">土地總價值</p>
-                        <p className="text-[9px] text-slate-400 font-bold italic">坪數 × 單價</p>
+                        <p className="text-[9px] text-slate-400 font-bold italic underline">土地坪數 × 土地單價</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -321,12 +321,27 @@ export default function App() {
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">月造價攤提</p>
-                        <p className="text-[9px] text-slate-400 font-bold italic">總造價 ÷ 年限 ÷ 12</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">造價攤提 (月)</p>
+                        <p className="text-[9px] text-slate-400 font-bold italic underline">總造價 ÷ 耐用年限 ÷ 12</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="text-xl font-black text-indigo-700 tracking-tighter">${Math.round(results.rentBuildCost).toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between px-8 md:col-span-2">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-rose-50 text-rose-600 rounded-2xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m19 8.5-4-4-4 4"/><path d="m5 15.5 4 4 4-4"/><path d="M15 4.5v15"/><path d="M9 19.5v-15"/></svg>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">建物獲利 (月)</p>
+                        <p className="text-[9px] text-slate-400 font-bold italic underline">當前建物殘值 × 投報率 ÷ 12</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-black text-rose-600 tracking-tighter">${Math.round(results.rentBuildRoi).toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
@@ -351,11 +366,11 @@ export default function App() {
                       </div>
                       <div className="mt-8 space-y-4">
                         <div className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex justify-between">
-                          <span className="text-xs font-bold text-slate-700">土地部分</span>
-                          <span className="font-black text-slate-800">${Math.round(results.landRentSubtotal).toLocaleString()}</span>
+                          <span className="text-xs font-bold text-slate-700">土地獲利 (利潤)</span>
+                          <span className="font-black text-slate-800">${Math.round(results.rentLandRoi).toLocaleString()}</span>
                         </div>
                         <div className="p-4 bg-indigo-50/30 rounded-2xl border border-indigo-100/50 flex justify-between">
-                          <span className="text-xs font-bold text-indigo-700">建物部分</span>
+                          <span className="text-xs font-bold text-indigo-700">建物部分 (獲利+攤提)</span>
                           <span className="font-black text-indigo-700">${Math.round(results.buildRentSubtotal).toLocaleString()}</span>
                         </div>
                       </div>
@@ -486,7 +501,7 @@ export default function App() {
                   <>
                     <li className="flex justify-between border-t border-slate-50 pt-3"><span className="text-slate-500">土地坪數</span><span className="font-black">{inputs.landArea} 坪</span></li>
                     <li className="flex justify-between"><span className="text-slate-500">土地單價</span><span className="font-black">{inputs.landPingPrice} 萬/坪</span></li>
-                    <li className="flex justify-between"><span className="text-slate-500 font-black text-indigo-600">土地總價值</span><span className="font-black text-indigo-600">${Math.round(results.landTotalVal).toLocaleString()}</span></li>
+                    <li className="flex justify-between font-black text-indigo-600"><span className="text-slate-500">土地總價值</span><span className="font-black">${Math.round(results.landTotalVal).toLocaleString()}</span></li>
                     <li className="text-[9px] text-slate-400 italic text-right -mt-2">(公式：土地坪數 × 土地單價)</li>
                   </>
                 )}
@@ -516,25 +531,31 @@ export default function App() {
           </div>
 
           <div className="mb-12">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-4">月建議收益細項 (綜合模式)</h3>
-            <div className="space-y-3 px-2">
-              <div className="flex justify-between text-sm font-medium">
-                <span className="text-slate-500">月造價攤提</span>
-                <span className="font-black">${Math.round(results.rentBuildCost).toLocaleString()}</span>
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-4">月建議收益細項 (租金組成)</h3>
+            <div className="space-y-4 px-2">
+              <div className="border-l-4 border-slate-200 pl-4">
+                <div className="flex justify-between text-sm font-bold">
+                  <span>月造價攤提</span>
+                  <span>${Math.round(results.rentBuildCost).toLocaleString()}</span>
+                </div>
+                <p className="text-[9px] text-slate-400 italic">(公式：原始總造價 ÷ 耐用年限 ÷ 12個月)</p>
               </div>
-              <p className="text-[9px] text-slate-400 italic text-right -mt-2">(公式：原始總造價 ÷ 耐用年限 ÷ 12個月)</p>
               
-              <div className="flex justify-between text-sm font-medium">
-                <span className="text-slate-500">月預期利潤 (建物)</span>
-                <span className="font-black">${Math.round(results.rentBuildRoi).toLocaleString()}</span>
+              <div className="border-l-4 border-slate-200 pl-4">
+                <div className="flex justify-between text-sm font-bold">
+                  <span>月預期獲利 (建物)</span>
+                  <span>${Math.round(results.rentBuildRoi).toLocaleString()}</span>
+                </div>
+                <p className="text-[9px] text-slate-400 italic">(公式：當前建物殘值 × 年投報率 ÷ 12個月)</p>
               </div>
-              <p className="text-[9px] text-slate-400 italic text-right -mt-2">(公式：當前建物殘值 × 年投報率 ÷ 12個月)</p>
 
-              <div className="flex justify-between text-sm font-medium">
-                <span className="text-slate-500">月預期利潤 (土地)</span>
-                <span className="font-black">${Math.round(results.rentLandRoi).toLocaleString()}</span>
+              <div className="border-l-4 border-slate-200 pl-4">
+                <div className="flex justify-between text-sm font-bold">
+                  <span>月預期獲利 (土地)</span>
+                  <span>${Math.round(results.rentLandRoi).toLocaleString()}</span>
+                </div>
+                <p className="text-[9px] text-slate-400 italic">(公式：土地總價值 × 年投報率 ÷ 12個月)</p>
               </div>
-              <p className="text-[9px] text-slate-400 italic text-right -mt-2">(公式：土地總價值 × 年投報率 ÷ 12個月)</p>
             </div>
           </div>
 
@@ -560,7 +581,7 @@ export default function App() {
                 ))}
               </tbody>
             </table>
-            <p className="text-[9px] text-slate-400 mt-4 italic">* 明細表僅顯示關鍵年份及目前屋齡節點，完整清單請參閱系統線上版。</p>
+            <p className="text-[9px] text-slate-400 mt-4 italic">* 明細表僅顯示關鍵年份、目前屋齡節點。完整清單請參閱系統線上版。</p>
           </div>
 
           <div className="mt-20 border-t border-slate-100 pt-8 text-center">
